@@ -147,12 +147,12 @@
       btnDownload.textContent = `Download ${user}`;
       btnDownload.onclick = () => downloadSave(user);
 
-      // --- NEW: Get Save button ---
+      // --- FIXED: Get Save button ---
       const btnGetSave = document.createElement('button');
       btnGetSave.textContent = `Get ${user} Save`;
       btnGetSave.onclick = () => {
-        document.getElementById('usernameInput').value = user;
-        document.getElementById('usernameInput').focus();
+        document.getElementById('username').value = user;
+        document.getElementById('username').focus();
       };
 
       // Delete button
@@ -163,7 +163,7 @@
 
       li.textContent = user + ' ';
       li.appendChild(btnDownload);
-      li.appendChild(btnGetSave);   // <--- Your new button here!
+      li.appendChild(btnGetSave);
       li.appendChild(btnDelete);
       listElem.appendChild(li);
     });
