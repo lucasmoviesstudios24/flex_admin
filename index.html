@@ -121,31 +121,63 @@
     }
 
 
-async function listPlayers() {
-  document.getElementById('result').textContent = '';
-  document.getElementById('error').textContent = '';
-  const listElem = document.getElementById('playerList');
-  listElem.innerHTML = 'Loading...';
+  // Your other admin functions like getSave, updateSave, etc.
 
-  try {
-    const res = await fetch('https://flex-sdww.onrender.com/api/game/list');
-    if (!res.ok) throw new Error('Failed to fetch player list');
-    const players = await res.json();
+  // Replace your existing listPlayers with this:
+  async function listPlayers() {
+    document.getElementById('result').textContent = '';
+    document.getElementById('error').textContent = '';
+    const listElem = document.getElementById('playerList');
+    listElem.innerHTML = 'Loading...';
 
-    listElem.innerHTML = '';
-    players.forEach(user => {
-      const li = document.createElement('li');
-      const btn = document.createElement('button');
-      btn.textContent = `Download ${user}`;
-      btn.onclick = () => downloadSave(user);
-      li.textContent = user + ' ';
-      li.appendChild(btn);
-      listElem.appendChild(li);
-    });
-  } catch (err) {
-    document.getElementById('error').textContent = 'Error: ' + err.message;
+    try {
+      const res = await fetch('https://flex-sdww.onrender.com/api/game/list');
+      if (!res.ok) throw new Error('Failed to fetch player list');
+      const players = await res.json();
+
+      listElem.innerHTML = '';
+      players.forEach(user => {
+        const li = document.createElement('li');
+        // Download button
+        const btnDownload = document.createElement('button');
+        btnDownload.textContent = `Download ${user}`;
+        btnDownload.onclick = () => downloadSave(user);
+
+        // Delete button
+        const btnDelete = document.createElement('button');
+        btnDelete.textContent = `Delete ${user}`;
+        btnDelete.style.color = 'red';
+        btnDelete.onclick = () => deletePlayerSave(user);
+
+        li.textContent = user + ' ';
+        li.appendChild(btnDownload);
+        li.appendChild(btnDelete);
+        listElem.appendChild(li);
+      });
+    } catch (err) {
+      document.getElementById('error').textContent = 'Error: ' + err.message;
+    }
   }
-}
+
+  // Add this function below listPlayers
+  async function deletePlayerSave(username) {
+    if (!confirm(`Are you sure you want to delete the save file for "${username}"? This cannot be undone.`)) {
+      return;
+    }
+    try {
+      const url = `https://flex-sdww.onrender.com/api/game/rawsave?user=${encodeURIComponent(username)}`;
+      const res = await fetch(url, { method: 'DELETE' });
+      const result = await res.json();
+      if (res.ok) {
+        document.getElementById('result').textContent = 'Save file deleted: ' + JSON.stringify(result, null, 2);
+        listPlayers(); // Refresh the player list after deletion
+      } else {
+        document.getElementById('error').textContent = 'Error: ' + (result.error || res.statusText);
+      }
+    } catch (err) {
+      document.getElementById('error').textContent = 'Request failed: ' + err.message;
+    }
+  }
 
 async function downloadSave(username) {
   try {
