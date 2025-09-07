@@ -150,7 +150,10 @@
       // --- NEW: Get Save button ---
       const btnGetSave = document.createElement('button');
       btnGetSave.textContent = `Get ${user} Save`;
-      btnGetSave.onclick = () => getSave(user);
+      btnGetSave.onclick = () => {
+        document.getElementById('usernameInput').value = user;
+        document.getElementById('usernameInput').focus();
+      };
 
       // Delete button
       const btnDelete = document.createElement('button');
