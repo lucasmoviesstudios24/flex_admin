@@ -30,6 +30,11 @@
   <pre id="result"></pre>
   <pre id="error"></pre>
 
+<h3>All Player Saves</h3>
+<button type="button" onclick="listPlayers()">List Players</button>
+<ul id="playerList"></ul>
+
+
   <script>
     async function getSave() {
       document.getElementById('result').textContent = '';
@@ -114,6 +119,55 @@
         document.getElementById('error').textContent = 'Request failed: ' + err.message;
       }
     }
+
+
+async function listPlayers() {
+  document.getElementById('result').textContent = '';
+  document.getElementById('error').textContent = '';
+  const listElem = document.getElementById('playerList');
+  listElem.innerHTML = 'Loading...';
+
+  try {
+    const res = await fetch('https://flex-sdww.onrender.com/api/game/list');
+    if (!res.ok) throw new Error('Failed to fetch player list');
+    const players = await res.json();
+
+    listElem.innerHTML = '';
+    players.forEach(user => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.textContent = `Download ${user}`;
+      btn.onclick = () => downloadSave(user);
+      li.textContent = user + ' ';
+      li.appendChild(btn);
+      listElem.appendChild(li);
+    });
+  } catch (err) {
+    document.getElementById('error').textContent = 'Error: ' + err.message;
+  }
+}
+
+async function downloadSave(username) {
+  try {
+    const url = `https://flex-sdww.onrender.com/api/game/rawsave?user=${encodeURIComponent(username)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch save for ' + username);
+    const data = await res.json();
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${username}_save.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (err) {
+    document.getElementById('error').textContent = 'Error: ' + err.message;
+  }
+}
+
+
+
   </script>
 </body>
 </html>
