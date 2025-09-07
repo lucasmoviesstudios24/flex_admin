@@ -125,39 +125,46 @@
 
   // Replace your existing listPlayers with this:
   async function listPlayers() {
-    document.getElementById('result').textContent = '';
-    document.getElementById('error').textContent = '';
-    const listElem = document.getElementById('playerList');
-    listElem.innerHTML = 'Loading...';
+  document.getElementById('result').textContent = '';
+  document.getElementById('error').textContent = '';
+  const listElem = document.getElementById('playerList');
+  listElem.innerHTML = 'Loading...';
 
-    try {
-      const res = await fetch('https://flex-sdww.onrender.com/api/game/list');
-      if (!res.ok) throw new Error('Failed to fetch player list');
-      const players = await res.json();
+  try {
+    const res = await fetch('https://flex-sdww.onrender.com/api/game/list');
+    if (!res.ok) throw new Error('Failed to fetch player list');
+    const players = await res.json();
 
-      listElem.innerHTML = '';
-      players.forEach(user => {
-        const li = document.createElement('li');
-        // Download button
-        const btnDownload = document.createElement('button');
-        btnDownload.textContent = `Download ${user}`;
-        btnDownload.onclick = () => downloadSave(user);
+    listElem.innerHTML = '';
+    players.forEach(user => {
+      const li = document.createElement('li');
 
-        // Delete button
-        const btnDelete = document.createElement('button');
-        btnDelete.textContent = `Delete ${user}`;
-        btnDelete.style.color = 'red';
-        btnDelete.onclick = () => deletePlayerSave(user);
+      // Download button
+      const btnDownload = document.createElement('button');
+      btnDownload.textContent = `Download ${user}`;
+      btnDownload.onclick = () => downloadSave(user);
 
-        li.textContent = user + ' ';
-        li.appendChild(btnDownload);
-        li.appendChild(btnDelete);
-        listElem.appendChild(li);
-      });
-    } catch (err) {
-      document.getElementById('error').textContent = 'Error: ' + err.message;
-    }
+      // --- NEW: Get Save button ---
+      const btnGetSave = document.createElement('button');
+      btnGetSave.textContent = `Get ${user} Save`;
+      btnGetSave.onclick = () => getSave(user);
+
+      // Delete button
+      const btnDelete = document.createElement('button');
+      btnDelete.textContent = `Delete ${user}`;
+      btnDelete.style.color = 'red';
+      btnDelete.onclick = () => deletePlayerSave(user);
+
+      li.textContent = user + ' ';
+      li.appendChild(btnDownload);
+      li.appendChild(btnGetSave);   // <--- Your new button here!
+      li.appendChild(btnDelete);
+      listElem.appendChild(li);
+    });
+  } catch (err) {
+    document.getElementById('error').textContent = 'Error: ' + err.message;
   }
+}
 
   // Add this function below listPlayers
   async function deletePlayerSave(username) {
