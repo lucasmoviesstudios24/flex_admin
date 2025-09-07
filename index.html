@@ -41,6 +41,9 @@
       document.getElementById('error').textContent = '';
       const username = document.getElementById('username').value.trim();
       if (!username) {
+        username = document.getElementById('usernameInput').value.trim();
+      }
+      if (!username) {
         document.getElementById('error').textContent = 'Username is required.';
         return;
       }
